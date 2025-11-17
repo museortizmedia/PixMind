@@ -25,7 +25,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
+    <div className="flex flex-col h-screen bg-gray-50 text-gray-800">
     <Navbar />
     <CustomRouter />
     </div>

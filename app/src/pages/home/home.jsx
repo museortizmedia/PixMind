@@ -30,12 +30,24 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="md:w-1/2 flex justify-center mb-10 md:mb-0">
-          {/* Imagen temporal */}
-          <div className="w-80 h-80 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400">
-            Imagen
+
+
+        <div className="md:w-1/2 flex justify-center mb-10 md:mb-0 hover:scale-105">
+          <div className="relative w-80 h-80 rounded-xl overflow-hidden">
+            {/* Imagen real */}
+            <img
+              src="/City.png"
+              alt="Imagen"
+              className="w-full h-full object-cover hover:shadow-2xl"
+            />
+
+            {/* Gradiente diagonal encima */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#4DE1E1]/20 to-[#FF96DC]/20"></div>
           </div>
         </div>
+
+
+
       </section>
 
       {/* Features Section */}
@@ -76,7 +88,7 @@ export default function Home() {
           ].map((feature) => (
             <div
               key={feature.number}
-              className="p-6 border rounded-xl shadow hover:shadow-lg transition flex flex-col items-center text-center"
+              className="p-6 border rounded-xl shadow transition flex flex-col items-center text-center hover:scale-105 hover:shadow-lg hover:shadow-lg"
             >
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
@@ -96,14 +108,14 @@ export default function Home() {
         {/* Imagen de fondo */}
         <div
           className="absolute inset-0 bg-gray-300 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://via.placeholder.com/1600x600')" }}
+          style={{ backgroundImage: "url('/Net.png')" }}
         ></div>
 
         {/* Gradiente diagonal encima */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#4DE1E1]/80 to-[#FF96DC]/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#4DE1E1]/90 to-[#FF96DC]/90"></div>
 
         {/* Contenido */}
-        <div className="relative z-10 max-w-3xl mx-auto">
+        <div className="relative z-10 max-w-3xl mx-auto text-[#fbfbfb]">
           <h2 className="text-3xl md:text-4xl font-bold">
             Incorpora visión por computadora en tus proyectos
           </h2>
@@ -112,7 +124,7 @@ export default function Home() {
           </p>
           <a
             href="/register"
-            className="mt-8 inline-block px-8 py-4 bg-white text-[#4DE1E1] rounded-xl font-semibold shadow hover:bg-gray-100 transition"
+            className="mt-8 inline-block px-8 py-4 bg-white text-[#4DE1E1] rounded-xl font-semibold shadow hover:bg-gray-100 transition hover:scale-105 hover:shadow-lg hover:shadow-lg"
           >
             Comenzar ahora
           </a>

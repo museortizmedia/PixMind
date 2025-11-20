@@ -22,34 +22,43 @@ const SIZE_CLASSES = {
 };
 
 /**
- * CommonButton
- * Props:
- * - children: contenido del botón
- * - variant: primary | secondary | success | danger
- * - size: sm | md | lg
- * - className: clases adicionales
- * - ...props: cualquier otro prop válido de button
+ * Spinner pequeño
  */
+const Spinner = () => (
+  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+);
+
 const CommonButton = ({
   children,
   variant = "primary",
   size = "md",
   className = "",
   href,
+  loading = false,
+  disabled,
   ...props
 }) => {
   const combinedClasses = `
     rounded-xl shadow transition transform hover:scale-105
+    flex items-center justify-center gap-2
     ${SIZE_CLASSES[size]}
     ${VARIANT_CLASSES[variant]}
     ${className}
-  `.trim().replace(/\s+/g, " ");
+    ${loading ? "opacity-70 cursor-not-allowed hover:scale-100" : ""}
+  `
+    .trim()
+    .replace(/\s+/g, " ");
 
   const Component = href ? "a" : "button";
 
   return (
-    <Component className={combinedClasses} href={href} {...props}>
-      {children}
+    <Component
+      className={combinedClasses}
+      href={href}
+      disabled={loading || disabled}
+      {...props}
+    >
+      {loading ? <Spinner /> : children}
     </Component>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../Contexts/AuthContext";
 import CommonButton from "../../components/CommonButton";
 
@@ -54,6 +54,10 @@ export default function Dashboard() {
     setOpenAccordion(openAccordion === id ? null : id);
   };
 
+  useEffect(() => {
+    document.title = "Inicio";
+  }, []);
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -63,7 +67,7 @@ export default function Dashboard() {
       </div>
     );
   }
-
+  
   return (
     <div className="flex flex-col min-h-screen bg-white">
 

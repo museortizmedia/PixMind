@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CommonButton from "../../components/CommonButton";
 import { apiClient } from "../../utils/apiClient";
 
@@ -8,11 +8,13 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setLoading(true);
 
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -22,16 +24,22 @@ export default function Register() {
     const { ok, data } = await apiClient("REGISTER", {
       method: "POST",
       body: { email, password },
-      onError: (err) => setError(err.message || "Error al crear la cuenta"),
+      onError: (err) => { setError(err.message || "Error al crear la cuenta"); setLoading(false); },
     });
 
     if (!ok) return;
 
     setSuccess("Cuenta creada correctamente. Redirigiendo al login...");
+    setLoading(false);
+
     setTimeout(() => {
       window.location.href = "/login";
     }, 2000);
   };
+
+  useEffect(() => {
+    document.title = "PixMind | Registrarse";
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -71,7 +79,7 @@ export default function Register() {
             required
           />
 
-          <CommonButton type="submit" variant="primary" size="lg" className="mt-4">
+          <CommonButton type="submit" variant="primary" size="lg" className="mt-4"  loading={loading}>
             Comenzar
           </CommonButton>
 

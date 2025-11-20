@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CommonButton from "../../components/CommonButton";
 
 export default function Home() {
+  useEffect(() => {
+    document.title = "PixMind | Inicio";
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Hero Section */}

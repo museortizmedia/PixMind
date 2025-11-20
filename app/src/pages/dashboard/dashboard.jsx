@@ -1,31 +1,73 @@
-import React from "react";
+import React, { useState, useRef } from "react";
+import { useAuth } from "../../Contexts/AuthContext";
+import CommonButton from "../../components/CommonButton";
 
 export default function Dashboard() {
-  return (
-    <div className="max-w-3xl mx-auto mt-16 bg-white p-10 rounded-xl shadow">
-      <h2 className="text-4xl font-semibold">Tu Panel</h2>
+  const { user } = useAuth();
+  const [copied, setCopied] = useState(false);
+  const apiKeyRef = useRef(null);
 
-      <p className="mt-4 text-gray-700">
-        Aquí podrás ver tu token, uso de la API y ejemplos.
-      </p>
+  const copyApiKey = () => {
+    if (user?.user?.apiKey) {
+      navigator.clipboard.writeText(user.user.apiKey);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold">Tu token:</h3>
+  const selectApiKey = () => {
+    if (apiKeyRef.current) {
+      const range = document.createRange();
+      range.selectNodeContents(apiKeyRef.current);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  };
 
-        <p className="bg-gray-100 p-3 rounded-lg mt-2 font-mono">
-          pk_live_TOKEN_DE_EJEMPLO_123
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <p className="text-gray-700 text-lg">
+          Debes iniciar sesión para acceder al Dashboard.
         </p>
       </div>
+    );
+  }
 
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold">Ejemplo de uso:</h3>
+  return (
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* Hero Section */}
+      <section className="px-8 py-20 max-w-6xl mx-auto text-center">
+        <h1 className="text-5xl font-bold bg-gradient-to-r from-[#4DE1E1] to-[#FF96DC] !text-transparent bg-clip-text">
+          Dashboard
+        </h1>
+        <p className="mt-6 text-lg text-gray-700">
+          Bienvenido, {user.user.email}. Aquí puedes ver tu API Key y ejemplos de uso.
+        </p>
+      </section>
 
-        <pre className="bg-gray-100 p-4 rounded-lg mt-3 text-sm overflow-auto">
-POST /api/vehicles/classify
-Header: Authorization: Bearer TU_TOKEN
-Body: imagen del vehículo
-        </pre>
-      </div>
+      {/* API Key Section */}
+      <section className="px-8 py-10 max-w-3xl mx-auto bg-white border-zinc-100 border rounded-xl shadow-lg">
+        <h2 className="text-2xl font-semibold text-gray-900">Tu API Key:</h2>
+        <div className="mt-4 flex flex-col md:flex-row md:items-center gap-4">
+          <p
+            ref={apiKeyRef}
+            onClick={selectApiKey}
+            className="bg-gray-100 p-3 text-sm rounded-lg font-mono break-all cursor-pointer select-text"
+            title="Haz clic para seleccionar todo"
+          >
+            {user.user.apiKey}
+          </p>
+          <CommonButton
+            onClick={copyApiKey}
+            variant={copied ? "contrastA" : "primary"}
+            size="sm"
+          >
+            {copied ? "Copiado ✅" : "Copiar"}
+          </CommonButton>
+        </div>
+      </section>
     </div>
   );
 }

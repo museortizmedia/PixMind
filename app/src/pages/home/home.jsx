@@ -1,9 +1,9 @@
 import React from "react";
+import CommonButton from "../../components/CommonButton";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
-
       {/* Hero Section */}
       <section className="flex flex-col-reverse md:flex-row items-center px-8 py-20 max-w-6xl mx-auto">
         <div className="md:w-1/2 text-center md:text-left">
@@ -14,23 +14,16 @@ export default function Home() {
           <p className="mt-6 text-lg text-gray-700">
             PixMind es un hub unificado de servicios de visión por computadora, diseñado para que desarrolladores y empresas integren capacidades avanzadas de procesamiento de imágenes sin necesidad de desplegar ni mantener modelos por separado.
           </p>
+
           <div className="mt-8 flex justify-center md:justify-start gap-4">
-            <a
-              href="/register"
-              className="px-6 py-3 bg-[#4DE1E1] text-white rounded-xl shadow hover:bg-[#38caca] transition"
-            >
+            <CommonButton as="a" href="/register" variant="primary">
               Comenzar
-            </a>
-            <a
-              href="/login"
-              className="px-6 py-3 bg-[#FF96DC] text-white rounded-xl shadow hover:bg-[#e68fc5] transition"
-            >
+            </CommonButton>
+            <CommonButton as="a" href="/login" variant="secondary">
               Ingresar
-            </a>
+            </CommonButton>
           </div>
         </div>
-
-
 
         <div className="md:w-1/2 flex justify-center mb-10 md:mb-0 hover:scale-105">
           <div className="relative w-80 h-80 rounded-xl overflow-hidden">
@@ -45,9 +38,6 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#4DE1E1]/20 to-[#FF96DC]/20"></div>
           </div>
         </div>
-
-
-
       </section>
 
       {/* Features Section */}
@@ -88,7 +78,7 @@ export default function Home() {
           ].map((feature) => (
             <div
               key={feature.number}
-              className="p-6 border rounded-xl shadow transition flex flex-col items-center text-center hover:scale-105 hover:shadow-lg hover:shadow-lg"
+              className="p-6 border rounded-xl shadow transition flex flex-col items-center text-center hover:scale-105 hover:shadow-lg"
             >
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
@@ -105,16 +95,12 @@ export default function Home() {
 
       {/* Call to Action Section */}
       <section className="relative px-8 py-20 text-white text-center">
-        {/* Imagen de fondo */}
         <div
           className="absolute inset-0 bg-gray-300 bg-cover bg-center"
           style={{ backgroundImage: "url('/Net.png')" }}
         ></div>
-
-        {/* Gradiente diagonal encima */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#4DE1E1]/90 to-[#FF96DC]/90"></div>
 
-        {/* Contenido */}
         <div className="relative z-10 max-w-3xl mx-auto text-[#fbfbfb]">
           <h2 className="text-3xl md:text-4xl font-bold">
             Incorpora visión por computadora en tus proyectos
@@ -122,12 +108,12 @@ export default function Home() {
           <p className="mt-4">
             Con PixMind puedes añadir inteligencia visual de manera rápida, modular y eficiente, sin preocuparte por la infraestructura.
           </p>
-          <a
-            href="/register"
-            className="mt-8 inline-block px-8 py-4 bg-white text-[#4DE1E1] rounded-xl font-semibold shadow hover:bg-gray-100 transition hover:scale-105 hover:shadow-lg hover:shadow-lg"
-          >
-            Comenzar ahora
-          </a>
+
+          <div className="mt-8">
+            <CommonButton as="a" href="/register" variant="contrastA" size="lg" className="font-bold">
+              Comenzar ahora
+            </CommonButton>
+          </div>
         </div>
       </section>
 

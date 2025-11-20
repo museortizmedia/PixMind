@@ -5,29 +5,28 @@ import Home from './pages/home/home';
 import Login from './pages/login/login';
 import Register from './pages/register/register';
 
-function App() {
+function CustomRouter() {
+  const path = window.location.pathname;
 
-  function CustomRouter() {
-    const path = window.location.pathname;
-
-    switch (path) {
-      case "/":
-        return <Home />;
-      case "/login":
-        return <Login />;
-      case "/register":
-        return <Register />;
-      case "/dashboard":
-        return <Dashboard />;
-      default:
-        return <Home />;
-    }
+  switch (path) {
+    case "/":
+      return <Home />;
+    case "/login":
+      return <Login />;
+    case "/register":
+      return <Register />;
+    case "/dashboard":
+      return <Dashboard />;
+    default:
+      return <Home />;
   }
+}
 
+function App() {
   return (
-    <div className="flex flex-col h-screen bg-gray-50 text-gray-800">
-    <Navbar />
-    <CustomRouter />
+    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
+      <Navbar />
+      <CustomRouter />
     </div>
   )
 }

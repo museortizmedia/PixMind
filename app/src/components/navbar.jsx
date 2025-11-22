@@ -7,10 +7,14 @@ export default function Navbar() {
   const [loadingCredits, setLoadingCredits] = useState(false);
 
   const links = user
-    ? [{ name: "Dashboard", href: "/dashboard" }]
+    ? [
+      { name: "Dashboard", href: "/dashboard" },
+      { name: "Docs", href: "/docs" },
+    ]
     : [
         { name: "Login", href: "/login" },
         { name: "Registro", href: "/register" },
+        { name: "Docs", href: "/docs" },
       ];
 
   const handleRefreshCredits = async () => {

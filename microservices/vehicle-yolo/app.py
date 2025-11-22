@@ -1,17 +1,90 @@
 from flask import Flask, request, jsonify
 from PIL import Image
 import numpy as np
+import onnxruntime as ort
 import io
 import os
 
-from ultralytics.yolo.engine.model import YOLO
+# -----------------------------
+# Cargar modelo ONNX YOLOv8n
+# -----------------------------
+MODEL_PATH = "yolov8n.onnx"
 
-app = Flask(__name__)
+session = ort.InferenceSession(
+    MODEL_PATH,
+    providers=["CPUExecutionProvider"]
+)
 
-MODEL_PATH = "yolov8n.pt"
-model = YOLO(MODEL_PATH)
+input_name = session.get_inputs()[0].name
+
+# Clases de YOLOv8 (COCO)
+COCO_CLASSES = [
+    "person","bicycle","car","motorcycle","airplane","bus","train","truck","boat",
+    "traffic light","fire hydrant","stop sign","parking meter","bench",
+    "bird","cat","dog","horse","sheep","cow","elephant","bear","zebra","giraffe",
+    "backpack","umbrella","handbag","tie","suitcase","frisbee","skis","snowboard",
+    "sports ball","kite","baseball bat","baseball glove","skateboard","surfboard",
+    "tennis racket","bottle","wine glass","cup","fork","knife","spoon","bowl",
+    "banana","apple","sandwich","orange","broccoli","carrot","hot dog","pizza",
+    "donut","cake","chair","couch","potted plant","bed","dining table","toilet",
+    "tv","laptop","mouse","remote","keyboard","cell phone","microwave","oven",
+    "toaster","sink","refrigerator","book","clock","vase","scissors","teddy bear",
+    "hair drier","toothbrush"
+]
 
 VEHICLE_CLASSES = {"car", "truck", "bus", "motorcycle", "bicycle"}
+
+
+def preprocess(img: Image.Image):
+    img = img.resize((640, 640))
+    img = img.convert("RGB")
+    arr = np.array(img).astype(np.float32)
+    arr = arr / 255.0
+    arr = np.transpose(arr, (2, 0, 1))  # HWC → CHW
+    arr = np.expand_dims(arr, 0)
+    return arr
+
+
+def postprocess(outputs, orig_w, orig_h, conf_th=0.25):
+    preds = outputs[0]  # (1, N, 84)
+    preds = preds[0]    # (N, 84)
+
+    detections = []
+
+    for det in preds:
+        cls_conf = det[4:]
+        cls_id = np.argmax(cls_conf)
+        score = cls_conf[cls_id]
+
+        if score < conf_th:
+            continue
+
+        cls_name = COCO_CLASSES[cls_id]
+
+        if cls_name not in VEHICLE_CLASSES:
+            continue
+
+        x, y, w, h = det[0], det[1], det[2], det[3]
+        x1 = int((x - w/2) * orig_w / 640)
+        y1 = int((y - h/2) * orig_h / 640)
+        x2 = int((x + w/2) * orig_w / 640)
+        y2 = int((y + h/2) * orig_h / 640)
+
+        detections.append({
+            "class": cls_name,
+            "confidence": float(score),
+            "bbox": {
+                "x1": x1,
+                "y1": y1,
+                "x2": x2,
+                "y2": y2
+            }
+        })
+
+    return detections
+
+
+app = Flask(__name__)
 
 
 @app.route("/detect", methods=["POST"])
@@ -22,35 +95,16 @@ def detect():
     file = request.files["file"]
 
     try:
-        img = Image.open(io.BytesIO(file.read())).convert("RGB")
+        img = Image.open(io.BytesIO(file.read()))
     except Exception as e:
         return jsonify({"error": f"Invalid image: {str(e)}"}), 400
 
-    results = model.predict(img, imgsz=640, conf=0.25, verbose=False)
+    w, h = img.size
 
-    detections = []
+    inp = preprocess(img)
+    outputs = session.run(None, {input_name: inp})
 
-    for r in results:
-        for box in r.boxes:
-            cls_id = int(box.cls.cpu().numpy()[0])
-            cls_name = model.names[cls_id]
-
-            if cls_name not in VEHICLE_CLASSES:
-                continue
-
-            x1, y1, x2, y2 = box.xyxy[0].cpu().numpy().tolist()
-            conf = float(box.conf.cpu().numpy()[0])
-
-            detections.append({
-                "class": cls_name,
-                "confidence": round(conf, 4),
-                "bbox": {
-                    "x1": int(x1),
-                    "y1": int(y1),
-                    "x2": int(x2),
-                    "y2": int(y2)
-                }
-            })
+    detections = postprocess(outputs, w, h)
 
     return jsonify({
         "detections_count": len(detections),

@@ -49,34 +49,35 @@ export function validateServicePayload(serviceName, file, body) {
 /**
  * LLAMADA REAL AL MICROSERVICIO
  */
-export async function callMicroservice(serviceName, fileBuffer, filename, body = {}) {
+export async function callMicroservice(serviceName, mainFile, extraFiles = [], body = {}) {
   const service = SERVICE_REGISTRY[serviceName];
   if (!service) throw new Error("Service not configured");
 
-  const fields = service.fields;
-
-  // obtener el nombre DEL CAMPO que es un archivo
-  const fileFieldName = Object.keys(fields).find(
-    key => fields[key].type === "file"
-  );
-
-  if (!fileFieldName)
-    throw new Error(`No file field defined for service '${serviceName}'`);
-
   const form = new FormData();
 
-  // enviar el archivo con el nombre que pide el worker
-  form.append(fileFieldName, fileBuffer, filename);
+  // Recorrer todos los campos tipo file definidos en fields
+  const fileFields = Object.entries(service.fields).filter(([_, rule]) => rule.type === "file");
 
-  // enviar parámetros extra del body
+  fileFields.forEach(([key], index) => {
+    if (index === 0) {
+      // Primer archivo → mainFile
+      form.append(key, mainFile.buffer, mainFile.originalname);
+    } else if (extraFiles[index - 1]) {
+      // Archivos extra → extraFiles
+      form.append(key, extraFiles[index - 1].buffer, extraFiles[index - 1].originalname);
+    }
+  });
+
+  // Agregar campos de body
   Object.entries(body).forEach(([key, value]) => {
     if (value !== undefined) form.append(key, value);
   });
 
   const resp = await axios.post(service.endpoint, form, {
     headers: form.getHeaders(),
+    responseType: 'arraybuffer',
     timeout: 60000
   });
 
-  return resp.data;
+  return { data: resp.data, contentType: resp.headers['content-type'] };
 }

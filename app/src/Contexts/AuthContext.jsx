@@ -18,7 +18,10 @@ export const AuthProvider = ({ children }) => {
     if (!user?.token) return;
 
     try {
-      const response = await fetch("http://localhost:4000/auth/me", {
+      const baseURL = window.location.hostname === "localhost"
+        ? "http://localhost:4000/"
+        : (import.meta.env.VITE_API_URL || "");
+      const response = await fetch( `${baseURL}/auth/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       refreshUser();
-    }, 60000); // 60.000 ms = 1 minuto
+    }, 300000); // 60.000 ms = 1 minuto, 300.000 ms = 5 minutos
 
     return () => clearInterval(interval); // limpiar al desmontar
   }, [user]);

@@ -165,7 +165,7 @@ const buildFormData = async () => {
             const service = SERVICE_REGISTRY[selectedService];
             const baseURL = window.location.hostname === "localhost"
                 ? "http://localhost:4000/model"
-                : "https://pixmind.onrender.com/model";
+                : (import.meta.env.VITE_API_URL || "");
 
             const res = await fetch(`${baseURL}/${service.docs?.worker || selectedService}`, {
                 method: "POST",

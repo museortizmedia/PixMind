@@ -63,7 +63,7 @@ const prettyJSON = (obj) => {
   const renderService = (name) => {
     const service = SERVICE_REGISTRY[name];
     const endpoint = service.docs?.worker
-      ? `https://pixmind.onrender.com/model/${service.docs.worker}`
+      ? `${import.meta.env.VITE_API_URL || ""}/${service.docs.worker}`
       : service.endpoint;
 
     const fieldKeys = Object.keys(service.fields);

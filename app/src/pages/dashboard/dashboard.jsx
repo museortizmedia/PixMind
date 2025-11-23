@@ -1,35 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../Contexts/AuthContext";
 import CommonButton from "../../components/CommonButton";
-
-const ejemploModelos = [
-  {
-    id: "vehicle-plate",
-    nombre: "Detección de Placa Vehicular",
-    descripcion: "Analiza una imagen para identificar el tipo de vehículo y extraer la placa",
-    valorObtenido: "JSON con tipo de vehículo y placa formateada",
-    entradasEsperadas: ["image: archivo (multipart/form-data)"],
-    documentacion: `Ejemplo de uso:
-
-POST /api/vehicle-plate
-Headers: Authorization: Bearer <API_KEY>
-Content-Type: multipart/form-data
-Body: 
-  - image: archivo de imagen del vehículo
-
-Respuesta esperada:
-{
-  "vehicleType": "automóvil",
-  "plate": "ABC-1234",
-  "found": true
-}`
-  }
-];
+import EndpointTester from "../EndpointTester/EndpointTester";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState(null);
   const apiKeyRef = useRef(null);
 
   const copyApiKey = () => {
@@ -48,10 +24,6 @@ export default function Dashboard() {
       sel.removeAllRanges();
       sel.addRange(range);
     }
-  };
-
-  const toggleAccordion = (id) => {
-    setOpenAccordion(openAccordion === id ? null : id);
   };
 
   useEffect(() => {
@@ -102,30 +74,9 @@ export default function Dashboard() {
           </CommonButton>
         </div>
       </section>
-
-      {/* Modelos Accordion */}
-      <section className="px-8 my-5 py-10 max-w-4xl w-full mx-auto bg-white border-zinc-100 border rounded-xl shadow-lg space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-900">Modelos Disponibles</h2>
-        {ejemploModelos.map((modelo) => (
-          <div key={modelo.id} className="border rounded-xl shadow-sm overflow-hidden w-full">
-            <button
-              onClick={() => toggleAccordion(modelo.id)}
-              className="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 flex justify-between items-center"
-            >
-              <span>{modelo.nombre} - {modelo.descripcion}</span>
-              <span>{openAccordion === modelo.id ? "▲" : "▼"}</span>
-            </button>
-            {openAccordion === modelo.id && (
-              <div className="px-4 py-3 bg-white space-y-2 text-sm">
-                <p><strong>Valor obtenido:</strong> {modelo.valorObtenido}</p>
-                <p><strong>Entradas esperadas:</strong> {modelo.entradasEsperadas.join(", ")}</p>
-                <pre className="bg-gray-100 p-2 rounded text-xs whitespace-pre-wrap">
-                  {modelo.documentacion}
-                </pre>
-              </div>
-            )}
-          </div>
-        ))}
+      
+      <section>
+        <EndpointTester/>
       </section>
     </div>
   );

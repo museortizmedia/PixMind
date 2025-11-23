@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../Contexts/AuthContext";
 import CommonButton from "../../components/CommonButton";
-import { apiClient } from "../../utils/apiClient"; // importa tu cliente
-import { ENDPOINTS } from "../../utils/endpoints"; // opcional, solo si quieres usar ENDPOINTS directamente
+import { apiClient } from "../../utils/apiClient";
 
 export default function Login() {
   const { login } = useAuth();

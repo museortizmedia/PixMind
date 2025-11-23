@@ -164,10 +164,10 @@ const buildFormData = async () => {
             const formData = await buildFormData();
             const service = SERVICE_REGISTRY[selectedService];
             const baseURL = window.location.hostname === "localhost"
-                ? "http://localhost:4000/model"
+                ? "http://localhost:4000"
                 : (import.meta.env.VITE_API_URL || "");
 
-            const res = await fetch(`${baseURL}/${service.docs?.worker || selectedService}`, {
+            const res = await fetch(`${baseURL}/model/${service.docs?.worker || selectedService}`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${user.token}`,

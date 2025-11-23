@@ -89,7 +89,6 @@ export default function Navbar() {
           <button
             onClick={() => {
               logout();
-              window.location.href = "/";
             }}
             className="text-gray-700 hover:text-[#FF96DC] font-medium ml-4"
           >

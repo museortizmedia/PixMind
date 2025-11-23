@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { apiClient } from "../utils/apiClient";
 
 const AuthContext = createContext();
 
@@ -15,51 +16,71 @@ export const AuthProvider = ({ children }) => {
 
   // Función para refrescar la sesión y actualizar créditos
   const refreshUser = async () => {
+    // Si no hay usuario o no hay token, no hacemos nada
     if (!user?.token) return;
 
-    try {
-      const baseURL = window.location.hostname === "localhost"
-        ? "http://localhost:4000/"
-        : (import.meta.env.VITE_API_URL || "");
-      const response = await fetch( `${baseURL}/auth/me`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+    // Usamos apiClient con la key 'ME' (definida en tus ENDPOINTS)
+    const { ok, data } = await apiClient("ME", {
+      headers: {
+        // Inyectamos el token actual en la cabecera
+        Authorization: `Bearer ${user.token}`,
+      },
+      // Opcional: Si quieres loguear errores específicos de red
+      onError: (err) => console.error("Error silencioso al refrescar:", err),
+    });
 
-      if (!response.ok) throw new Error("No se pudo actualizar la sesión");
-
-      const data = await response.json();
-
-      // Solo actualizamos user.user, mantenemos token
+    if (ok) {
+      // 'data' ya es el cuerpo de la respuesta JSON parseado por apiClient
+      // Mantenemos el token antiguo, actualizamos la info del usuario
       const updatedUser = { ...user, user: data };
+
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
-    } catch (err) {
-      console.error("Error al actualizar sesión:", err);
+    } else {
+      // Opcional: Si el token expiró (ej. error 401), podrías cerrar sesión aquí
+      console.warn("No se pudo refrescar la sesión. Token podría ser inválido.");
     }
   };
 
-  // Intervalo para refrescar la sesión cada 60 segundos
+  // Intervalo para refrescar la sesión cada 5 minutos (300,000 ms)
   useEffect(() => {
     const interval = setInterval(() => {
       refreshUser();
-    }, 300000); // 60.000 ms = 1 minuto, 300.000 ms = 5 minutos
+    }, 300000);
 
-    return () => clearInterval(interval); // limpiar al desmontar
-  }, [user]);
+    return () => clearInterval(interval);
+  }, [user]); // Dependencia 'user' para tener acceso al token más reciente
 
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (user?.token) {
+      await apiClient("LOGOUT", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+        // No necesitamos manejar el éxito/error aquí.
+        // Incluso si la llamada al servidor falla, DEBEMOS cerrar la sesión local.
+        onError: (err) => console.error("Error al notificar logout al servidor:", err),
+      });
+    }
+
     setUser(null);
     localStorage.removeItem("user");
-  };
+    const AUTH_ROUTES = ["/login", "/register", "/dashboard"];
+    const currentPath = window.location.pathname;
+    const shouldRedirect = AUTH_ROUTES.some(route => currentPath.startsWith(route));
+
+    if (shouldRedirect) {
+      window.location.href = '/login';
+    } else {
+      window.location.reload();
+    }
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, refreshUser }}>

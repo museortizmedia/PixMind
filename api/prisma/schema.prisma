@@ -13,7 +13,7 @@ model User {
   password    String
   apiKey      String   @unique
   isVerified  Boolean  @default(false)
-  usage       Int      @default(0)
+  usage       Int      @default(1000)
   usageLimit  Int      @default(1000)
   createdAt   DateTime @default(now())
   logs        ApiLog[]

@@ -13,6 +13,7 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/login", login);
 router.get("/me", requireJwt, me);
+// No implementado
 router.get("/verify/:token", verifyEmailToken);
 router.post("/resend-verification", resendVerification);
 

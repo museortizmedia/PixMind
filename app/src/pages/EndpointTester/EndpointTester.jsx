@@ -288,8 +288,8 @@ const buildFormData = async () => {
 
             {/* CENTER BUTTON */}
             <div className="flex justify-center my-10">
-                <CommonButton onClick={runService} variant="primary" size="lg">
-                    {loading ? "Procesando..." : "Probar"}
+                <CommonButton loading={loading} title={loading ? "Procesando..." : ""} onClick={runService} variant="primary" size="lg">
+                    Probar
                 </CommonButton>
             </div>
         </div>

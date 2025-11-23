@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import { requireApiKey } from "../middlewares/requireApiKey.js";
 import { validateServicePayload, callMicroservice } from "../services/microservice.service.js";
+import { prisma } from "../services/prisma.js";
 
 const upload = multer();
 const router = express.Router();
@@ -18,6 +19,7 @@ router.post(
     const mainFile = req.files['image']?.[0];
     const extraFiles = req.files['extraImages'] || [];
     const body = req.body;
+    const userId = req.user.id;
 
     try {
       validateServicePayload(service, mainFile, body);
@@ -28,6 +30,17 @@ router.post(
         extraFiles,
         body
       );
+
+      // --- ✅ LÓGICA DE DECREMENTO DE USO ---
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          usage: {
+            increment: 1, // ✅ Aumenta el contador de uso en 1
+          }
+        }
+      });
+      // --- FIN LÓGICA DE DECREMENTO DE USO ---
 
       const { data, contentType } = microResp;
 

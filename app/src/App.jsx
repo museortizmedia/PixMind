@@ -4,7 +4,8 @@ import Dashboard from './pages/dashboard/dashboard';
 import Home from './pages/home/home';
 import Login from './pages/login/login';
 import Register from './pages/register/register';
-import DocsPage from './pages/docs/DocsPage';;
+import DocsPage from './pages/docs/DocsPage';
+import AdminPanel from './pages/AdminPanel/AdminPanel';
 
 function CustomRouter() {
   const path = window.location.pathname;
@@ -20,6 +21,8 @@ function CustomRouter() {
       return <Dashboard />;
     case "/docs":
       return <DocsPage/>;
+    case "/control":
+      return <AdminPanel/>;
     default:
       return <Home />;
   }

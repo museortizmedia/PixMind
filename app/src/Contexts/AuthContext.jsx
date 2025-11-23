@@ -1,90 +1,172 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 import { apiClient } from "../utils/apiClient";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+const ADMIN_EMAIL = "museortiz+pixmind@gmail.com";
+const SECRET_SALT = "mi_clave_secreta_para_firmar_datos_local";
 
-  // Carga inicial desde localStorage
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
-  }, []);
+// Funciones nativas para hashear y convertir arrays a string
+const hashData = async (data) => {
+    const buffer = new TextEncoder().encode(data);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+};
 
-  // Función para refrescar la sesión y actualizar créditos
-  const refreshUser = async () => {
-    // Si no hay usuario o no hay token, no hacemos nada
-    if (!user?.token) return;
+// --- Funciones de almacenamiento seguro ---
 
-    // Usamos apiClient con la key 'ME' (definida en tus ENDPOINTS)
-    const { ok, data } = await apiClient("ME", {
-      headers: {
-        // Inyectamos el token actual en la cabecera
-        Authorization: `Bearer ${user.token}`,
-      },
-      // Opcional: Si quieres loguear errores específicos de red
-      onError: (err) => console.error("Error silencioso al refrescar:", err),
+const secureSetStorage = async (userData) => {
+    const jsonString = JSON.stringify(userData);
+    const dataToHash = `${userData.token || ''}:${userData.user?.email || ''}:${SECRET_SALT}`;
+    
+    // Generación de Hash/Firma asíncrona
+    const signature = await hashData(dataToHash); 
+
+    const secureObject = JSON.stringify({
+        data: jsonString,
+        signature: signature
     });
+    
+    // Ofuscación con Base64
+    const obfuscatedData = btoa(secureObject); 
+    
+    localStorage.setItem("user", obfuscatedData);
+};
 
-    if (ok) {
-      // 'data' ya es el cuerpo de la respuesta JSON parseado por apiClient
-      // Mantenemos el token antiguo, actualizamos la info del usuario
-      const updatedUser = { ...user, user: data };
+const secureGetStorage = async () => {
+    const obfuscatedData = localStorage.getItem("user");
+    if (!obfuscatedData) return null;
 
-      setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-    } else {
-      // Opcional: Si el token expiró (ej. error 401), podrías cerrar sesión aquí
-      console.warn("No se pudo refrescar la sesión. Token podría ser inválido.");
+    try {
+        // Desofuscar con Base64
+        const secureObject = atob(obfuscatedData);
+        const { data: jsonString, signature: storedSignature } = JSON.parse(secureObject);
+
+        // Parsear datos de usuario
+        const userData = JSON.parse(jsonString);
+
+        // Recalcular el hash para verificar la integridad
+        const dataToHash = `${userData.token || ''}:${userData.user?.email || ''}:${SECRET_SALT}`;
+        const currentSignature = await hashData(dataToHash); 
+
+        if (currentSignature !== storedSignature) {
+            console.error("ALERTA DE SEGURIDAD: Datos de usuario manipulados en localStorage. Cerrando sesión.");
+            localStorage.removeItem("user");
+            return null;
+        }
+
+        return userData;
+
+    } catch (e) {
+        console.error("Error al procesar datos:", e);
+        localStorage.removeItem("user");
+        return null;
     }
-  };
+};
 
-  // Intervalo para refrescar la sesión cada 5 minutos (300,000 ms)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refreshUser();
-    }, 300000);
+// --- Componente AuthProvider ---
 
-    return () => clearInterval(interval);
-  }, [user]); // Dependencia 'user' para tener acceso al token más reciente
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-  };
+    // Carga inicial desde localStorage (Ahora es asíncrona)
+    useEffect(() => {
+        const loadUser = async () => {
+            const storedUser = await secureGetStorage();
+            if (storedUser) setUser(storedUser);
+        };
+        loadUser();
+    }, []);
 
-  const logout = async () => {
-    if (user?.token) {
-      await apiClient("LOGOUT", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        // No necesitamos manejar el éxito/error aquí.
-        // Incluso si la llamada al servidor falla, DEBEMOS cerrar la sesión local.
-        onError: (err) => console.error("Error al notificar logout al servidor:", err),
-      });
-    }
+    // --- FUNCIÓN MEMOIZADA 1: REFRESH USER ---
+    const refreshUser = useCallback(async () => {
+        if (!user?.token) return;
 
-    setUser(null);
-    localStorage.removeItem("user");
-    const AUTH_ROUTES = ["/login", "/register", "/dashboard"];
-    const currentPath = window.location.pathname;
-    const shouldRedirect = AUTH_ROUTES.some(route => currentPath.startsWith(route));
+        const { ok, data } = await apiClient("ME", {
+            headers: {
+                Authorization: `Bearer ${user.token}`,
+            },
+            onError: (err) => console.error("Error silencioso al refrescar:", err),
+        });
 
-    if (shouldRedirect) {
-      window.location.href = '/login';
-    } else {
-      window.location.reload();
-    }
-  }
+        if (ok) {
+            const updatedUser = { ...user, user: data };
+            setUser(updatedUser);
+            await secureSetStorage(updatedUser); // 👈 Guardado seguro asíncrono
+        } else {
+            console.warn("No se pudo refrescar la sesión. Token podría ser inválido.");
+        }
+    }, [user]);
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout, refreshUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    // --- FUNCIÓN MEMOIZADA 2: LOGIN ---
+    const login = useCallback(async (userData) => { // 👈 Ahora es asíncrona
+        setUser(userData);
+        await secureSetStorage(userData); // 👈 Guardado seguro asíncrono
+    }, []);
+
+    // --- FUNCIÓN MEMOIZADA 3: LOGOUT ---
+    const logout = useCallback(async () => {
+        if (user?.token) {
+            await apiClient("LOGOUT", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+                onError: (err) => console.error("Error al notificar logout al servidor:", err),
+            });
+        }
+
+        setUser(null);
+        localStorage.removeItem("user");
+        const AUTH_ROUTES = ["/login", "/register", "/dashboard"];
+        const currentPath = window.location.pathname;
+        const shouldRedirect = AUTH_ROUTES.some(route => currentPath.startsWith(route));
+
+        if (shouldRedirect) {
+            window.location.href = '/login';
+        } else {
+            window.location.reload();
+        }
+    }, [user]);
+
+    // Intervalo para refrescar la sesión
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refreshUser();
+        }, 300000);
+
+        return () => clearInterval(interval);
+    }, [refreshUser]);
+
+    // --- CÁLCULO DEL ESTADO DERIVADO CON useMemo ---
+    const authValues = useMemo(() => {
+        const currentUserEmail = user?.user?.email;
+        const isAdmin = currentUserEmail === ADMIN_EMAIL;
+        
+        const hasPermission = (requiredRole) => {
+            if (requiredRole === 'admin') {
+                return isAdmin;
+            }
+            return false;
+        };
+
+        return {
+            user,
+            isAdmin, 
+            hasPermission, 
+            login,       
+            logout,      
+            refreshUser, 
+        };
+    }, [user, login, logout, refreshUser]);
+
+    return (
+        <AuthContext.Provider value={authValues}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

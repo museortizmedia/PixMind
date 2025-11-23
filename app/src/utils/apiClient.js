@@ -15,10 +15,11 @@ import { ENDPOINTS } from "./endpoints.js";
  *   onSuccess?: Function,
  *   onError?: Function,
  *   onFinally?: Function
+ *   pathSuffix?: string
  * }} options
  */
 
-const BASE_URL  = window.location.hostname === "localhost" ? "http://localhost:4000" : (import.meta.env.VITE_API_URL || "");
+const BASE_URL = window.location.hostname === "localhost" ? "http://localhost:4000" : (import.meta.env.VITE_API_URL || "");
 
 export async function apiClient(
   key,
@@ -28,7 +29,8 @@ export async function apiClient(
     headers,
     onSuccess,
     onError,
-    onFinally
+    onFinally,
+    pathSuffix
   } = {}
 ) {
 
@@ -36,6 +38,12 @@ export async function apiClient(
 
   if (!endpoint) {
     throw new Error(`Endpoint "${key}" no existe en ENDPOINTS`);
+  }
+
+  let url = `${BASE_URL}${endpoint}`;
+  if (pathSuffix) {
+    const normalizedSuffix = pathSuffix.startsWith('/') ? pathSuffix : `/${pathSuffix}`;
+    url += normalizedSuffix;
   }
 
   try {
@@ -51,7 +59,7 @@ export async function apiClient(
       options.body = JSON.stringify(body);
     }
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, options);
+    const response = await fetch(url, options);
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {

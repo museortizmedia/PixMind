@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import modelRoutes from "./routes/model.routes.js";
+import adminRoutes from './routes/admin.routes.js'
 import { scheduleMonthlyReset } from "./utils/cronReset.js";
 
 dotenv.config();
@@ -13,6 +14,7 @@ app.use(express.json({ limit: "10mb" })); // imagenes en base64 si es necesario
 
 app.use("/auth", authRoutes);
 app.use("/model", modelRoutes);
+app.use("/admin", adminRoutes);
 
 app.get("/", (req, res) => res.send("PixMind API running"));
 

@@ -3,19 +3,19 @@ import { useAuth } from "../Contexts/AuthContext";
 
 export default function Navbar() {
   const path = window.location.pathname;
-  const { user, logout, refreshUser } = useAuth();
+  const { user, isAdmin, logout, refreshUser } = useAuth();
   const [loadingCredits, setLoadingCredits] = useState(false);
 
   const links = user
     ? [
       { name: "Dashboard", href: "/dashboard" },
       { name: "Docs", href: "/docs" },
-    ]
-    : [
-        { name: "Login", href: "/login" },
-        { name: "Registro", href: "/register" },
-        { name: "Docs", href: "/docs" },
-      ];
+      ...(isAdmin ? [{ name: "Admin Panel", href: "/control" }] : [])
+    ]:[
+      { name: "Login", href: "/login" },
+      { name: "Registro", href: "/register" },
+      { name: "Docs", href: "/docs" },
+    ];
 
   const handleRefreshCredits = async () => {
     if (!user) return;

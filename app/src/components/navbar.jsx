@@ -29,11 +29,15 @@ export default function Navbar() {
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-[#fffffff6]">
-      <a
-        href="/"
-        className="text-2xl font-bold bg-gradient-to-r from-[#4DE1E1] to-[#FF96DC] text-transparent bg-clip-text"
-      >
-        PixMind
+      <a href="/" className="flex items-center gap-2">
+        <img
+          src="/PixMind.png"
+          alt="PixMind logo"
+          className="w-12 h-12 object-contain"
+        />
+        <span className="text-2xl font-bold bg-gradient-to-r from-[#4DE1E1] to-[#FF96DC] text-transparent bg-clip-text">
+          PixMind
+        </span>
       </a>
 
       <div className="flex items-center gap-6">

@@ -1,4 +1,0 @@
-flask
-pillow
-numpy
-onnxruntime==1.17.0

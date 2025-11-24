@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../Contexts/AuthContext";
 import CommonButton from "../../components/CommonButton";
 import EndpointTester from "../EndpointTester/EndpointTester";
+import DemosSection from "../../components/DemosSection";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -30,6 +31,8 @@ export default function Dashboard() {
     document.title = "Inicio";
   }, []);
 
+
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -38,9 +41,7 @@ export default function Dashboard() {
         </p>
       </div>
     );
-  }
-  
-  return (
+  } return (
     <div className="flex flex-col min-h-screen bg-white">
 
       {/* Hero Section */}
@@ -74,10 +75,15 @@ export default function Dashboard() {
           </CommonButton>
         </div>
       </section>
-      
+
+      {/* Tester */}
       <section>
-        <EndpointTester/>
+        <EndpointTester />
       </section>
+
+      {/* Demos Section */}
+      <DemosSection />
+
     </div>
   );
 }

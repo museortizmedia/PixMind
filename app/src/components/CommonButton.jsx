@@ -9,6 +9,7 @@ const VARIANT_CLASSES = {
   contrastA: "bg-white text-[#4DE1E1] shadow-md hover:bg-gray",
   contrastB: "bg-white text-[#FF96DC] shadow-md hover:bg-gray",
   gradient: "bg-gradient-to-r from-[#4DE1E1] to-[#FF96DC] text-white shadow-md hover:opacity-90",
+  dynamicGradient: "bg-gradient-to-r from-[#4DE1E1] to-[#FF96DC] text-white shadow-xl hover:from-[#FF96DC] hover:to-[#4DE1E1]",
   link: "inline p-0 mx-0 px-0 bg-transparent text-[#4DE1E1] shadow-none hover:underline",
 };
 

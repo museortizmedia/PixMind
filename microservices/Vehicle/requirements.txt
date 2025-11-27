@@ -1,7 +1,10 @@
-flask
+fastapi
+uvicorn
+pillow
 ultralytics
 easyocr
-pillow
-gunicorn
 opencv-python-headless
 numpy
+python-multipart
+setuptools
+wheel

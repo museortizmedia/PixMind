@@ -6,7 +6,7 @@
  */
 export const SERVICE_REGISTRY = {
   pixmindVehicle: {
-    endpoint: "https://pixmindworkers.loca.lt/pixmindVehicle",
+    endpoint: "https://museortiz-pixmindVehicle.hf.space/run",
     description: "Se usa para mostrar detalles de vehículos. Lee placas, muestra el color aproximado, soporte multivehículo.",
     fields: {
       imagen: { type: "file", required: true },

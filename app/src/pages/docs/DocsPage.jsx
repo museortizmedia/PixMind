@@ -91,7 +91,7 @@ export default function DocsPage() {
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-700 mb-2">Body Fields (Multipart)</h3>
             <div className="overflow-hidden border border-gray-200 rounded-lg">
-               <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Field</th>
@@ -110,12 +110,12 @@ export default function DocsPage() {
                         <td className="px-4 py-3 text-sm text-gray-500 font-mono">&lt;{realField?.type}&gt;</td>
                         <td className="px-4 py-3 text-sm text-gray-600">{f.desc}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                        {f.required ? (
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            Yes
-                          </span>
-                        ) : "No"}
-                      </td>
+                          {f.required ? (
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              Yes
+                            </span>
+                          ) : "No"}
+                        </td>
                       </tr>
                     );
                   })}
@@ -129,17 +129,17 @@ export default function DocsPage() {
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-1">Ejemplo de request</h3>
           <pre className="bg-[#1e1e1e] text-green-300 p-4 rounded-lg text-sm overflow-auto font-mono leading-relaxed shadow-inner">
-{`POST ${endpoint}
+            {`POST ${endpoint}
 Content-Type: multipart/form-data
 ${service.docs?.headers?.map(h => `${h.key}: ${h.value}`).join('\n') || ''}
 
 ${service.docs?.fields
-  .map((f, idx) => {
-    const realKey = fieldKeys[idx];
-    const fieldType = service.fields[realKey]?.type || "unknown";
-    return `${f.label}: <${fieldType}>`;
-  })
-  .join("\n")}
+                .map((f, idx) => {
+                  const realKey = fieldKeys[idx];
+                  const fieldType = service.fields[realKey]?.type || "unknown";
+                  return `${f.label}: <${fieldType}>`;
+                })
+                .join("\n")}
 `}
           </pre>
         </div>
@@ -173,9 +173,8 @@ ${service.docs?.fields
           {filtered.map(name => (
             <li key={name}>
               <button
-                className={`w-full text-center px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors ${
-                  selected === name ? "bg-blue-100 text-blue-700 font-medium" : "text-gray-600"
-                }`}
+                className={`w-full text-center px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors ${selected === name ? "bg-blue-100 text-blue-700 font-medium" : "text-gray-600"
+                  }`}
                 onClick={() => setSelected(name)}
               >
                 {name}
@@ -190,6 +189,14 @@ ${service.docs?.fields
         <p className="text-gray-600 mb-8 border-b pb-4">
           Definición técnica de endpoints, headers y estructuras de datos.
         </p>
+
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 text-sm text-amber-800 flex items-center gap-3">
+          <span className="text-lg">⚠️</span>
+          <p>
+            <strong>Modo MVP:</strong> Los microservicios de IA no están desplegados permanentemente debido a costos de infraestructura.
+            Las peticiones a estos endpoints podrían no responder en tiempo real. Para una demo activa, contacta a inversión.
+          </p>
+        </div>
         {selected
           ? renderService(selected)
           : filtered.map(name => renderService(name))}

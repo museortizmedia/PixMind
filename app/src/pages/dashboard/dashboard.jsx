@@ -3,6 +3,7 @@ import { useAuth } from "../../Contexts/AuthContext";
 import CommonButton from "../../components/CommonButton";
 import EndpointTester from "../EndpointTester/EndpointTester";
 import DemosSection from "../../components/DemosSection";
+import MVPNotice from "../../components/MVPNotice";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -52,6 +53,11 @@ export default function Dashboard() {
         <p className="mt-6 text-lg text-gray-700">
           Bienvenido, {user.user.email}. Aquí puedes ver tu API Key y ejemplos de uso.
         </p>
+      </section>
+
+      {/* MVP Notice */}
+      <section className="px-8 pb-10 max-w-4xl mx-auto w-full">
+        <MVPNotice />
       </section>
 
       {/* API Key Section */}

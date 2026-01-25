@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../Contexts/AuthContext";
 import CommonButton from "../../components/CommonButton";
 import { apiClient } from "../../utils/apiClient";
+import MVPNotice from "../../components/MVPNotice";
 
 export default function Login() {
   const { login } = useAuth();
@@ -45,6 +46,8 @@ export default function Login() {
         <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-[#4DE1E1] to-[#FF96DC] text-transparent bg-clip-text">
           Iniciar sesión
         </h2>
+
+        <MVPNotice className="mb-6 scale-90 origin-top" />
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {error && <p className="text-red-500 text-sm">{error}</p>}

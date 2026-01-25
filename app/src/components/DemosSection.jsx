@@ -14,7 +14,7 @@ const DEMOS_LIST = [
         description: 'Simula un formulario que rellena datos (Placa, Color) automáticamente al subir la foto de un vehículo.',
         service: 'pixmindVehicle',
         component: RegistroVehicular,
-        icon: 'i-car', 
+        icon: 'i-car',
         color: 'bg-yellow-100',
         borderColor: 'border-yellow-500'
     },
@@ -23,7 +23,7 @@ const DEMOS_LIST = [
         title: 'Stickerify ✨',
         description: 'Quita fondos con AI para crear stikers rápidos',
         service: 'pixmindNoBG',
-        component: StickerRemoverPage, 
+        component: StickerRemoverPage,
         icon: 'i-cut',
         color: 'bg-green-100',
         borderColor: 'border-green-500'
@@ -42,9 +42,9 @@ const DEMOS_LIST = [
 
 export default function DemosSection() {
     const { user } = useAuth();
-    const [activeDemoId, setActiveDemoId] = useState(null); 
+    const [activeDemoId, setActiveDemoId] = useState(null);
     const demosContainerRef = useRef(null);
-    
+
     // Encuentra la demo activa para renderizar en el modal
     const ActiveDemoComponent = DEMOS_LIST.find(d => d.id === activeDemoId)?.component;
 
@@ -90,8 +90,8 @@ export default function DemosSection() {
                                     </p>
                                 </div>
                                 <div className="mt-4 pt-4 border-t border-gray-300">
-                                     <span className="text-xs font-mono text-gray-500 block mb-2">Endpoint: **{demo.service}**</span>
-                                     <CommonButton
+                                    <span className="text-xs font-mono text-gray-500 block mb-2">Endpoint: **{demo.service}**</span>
+                                    <CommonButton
                                         onClick={() => setActiveDemoId(demo.id)}
                                         variant="primary"
                                         size="sm"
@@ -103,19 +103,19 @@ export default function DemosSection() {
                             </div>
                         </div>
                     ))}
-                    
+
                 </div>
 
-                 <button
+                <button
                     onClick={() => scrollDemos('right')}
                     className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all hidden md:block"
                     aria-label="Desplazar derecha"
                 >
                     {'>'}
                 </button>
-                
-                 {/* Estilo para ocultar la barra de desplazamiento en el carrusel */}
-                 <style jsx global>{`
+
+                {/* Estilo para ocultar la barra de desplazamiento en el carrusel */}
+                <style jsx global>{`
                     .hide-scrollbar::-webkit-scrollbar {
                         display: none;
                     }
@@ -125,13 +125,13 @@ export default function DemosSection() {
                     }
                 `}</style>
             </div>
-            
+
             {/* Modal para la Demo Activa */}
             {activeDemoId && (
                 <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-[95vh] overflow-hidden flex flex-col">
-                        
-                        <header className="p-4 border-b border-gray-200 flex justify-between items-center">
+
+                        <header className="p-4 border-b border-gray-200 flex justify-between items-center bg-white relative z-10">
                             <h3 className="text-xl font-bold text-gray-800">
                                 {DEMOS_LIST.find(d => d.id === activeDemoId)?.title}
                             </h3>
@@ -143,6 +143,12 @@ export default function DemosSection() {
                                 &times;
                             </button>
                         </header>
+
+                        <div className="bg-amber-50 border-b border-amber-200 py-2 px-4 text-center">
+                            <p className="text-xs text-amber-800 font-medium italic">
+                                💡 Nota: Los microservicios de IA están actualmente inactivos por mantenimiento de costos. Si deseas una demostración funcional, por favor contacta a soporte.
+                            </p>
+                        </div>
 
                         <div className="flex-1 overflow-y-auto">
                             {ActiveDemoComponent && <ActiveDemoComponent userApiKey={user.user.apiKey} />}

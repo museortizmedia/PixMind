@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CommonButton from "../../components/CommonButton";
 import { apiClient } from "../../utils/apiClient";
+import MVPNotice from "../../components/MVPNotice";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -48,6 +49,8 @@ export default function Register() {
           Crear cuenta
         </h2>
 
+        <MVPNotice className="mb-6 scale-90 origin-top" />
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {error && <p className="text-red-500 text-sm">{error}</p>}
           {success && <p className="text-green-500 text-sm">{success}</p>}
@@ -79,7 +82,7 @@ export default function Register() {
             required
           />
 
-          <CommonButton type="submit" variant="primary" size="lg" className="mt-4"  loading={loading}>
+          <CommonButton type="submit" variant="primary" size="lg" className="mt-4" loading={loading}>
             Comenzar
           </CommonButton>
 
